@@ -122,7 +122,7 @@ extension QuizBLEManager: CBPeripheralDelegate {
             delegate?.didUpdateStatus("サービス取得エラー: \(error.localizedDescription)")
             return
         }
-        guard let name = deviceName(for: peripheral),
+        guard let _ = deviceName(for: peripheral),
               let services = peripheral.services else { return }
         for s in services where s.uuid == serviceUUID {
             peripheral.discoverCharacteristics([notifyCharUUID], for: s)
@@ -144,7 +144,7 @@ extension QuizBLEManager: CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        if let error = error { return }
+        if error != nil { return }
         guard characteristic.uuid == notifyCharUUID,
               let data = characteristic.value, data.count >= 1,
               data[0] == 0x01 else { return }

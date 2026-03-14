@@ -18,11 +18,6 @@ struct ContentView: View {
         GeometryReader { geo in
             let isLandscape = geo.size.width > geo.size.height
             VStack(spacing: 0) {
-                // ステータス・操作バー（上部）
-                statusBar(isLandscape: isLandscape)
-                    .frame(height: isLandscape ? 56 : 72)
-                    .background(Color(.systemGray6))
-
                 // 3台のボタンエリア（左・中央・右）― タップでリセット
                 HStack(spacing: 0) {
                     buttonPanel(deviceName: "button1", color: leftColor, label: "左", isLandscape: isLandscape)
@@ -34,6 +29,11 @@ struct ContentView: View {
                 .onTapGesture {
                     viewModel.reset()
                 }
+
+                // ステータス・操作バー（下部）
+                statusBar(isLandscape: isLandscape)
+                    .frame(height: isLandscape ? 56 : 72)
+                    .background(Color(.systemGray6))
             }
             .ignoresSafeArea(.container)
         }
