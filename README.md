@@ -66,6 +66,58 @@ open quiz_receive/quiz_receive.xcodeproj
 3. ボタン押下順に順位が表示される
 4. 画面タップでリセット → 次の問題へ
 
+## ボタンを追加する場合
+
+4台目以降のボタンを使うには、次の4箇所を変更する。
+
+### 1. ファームウェア（Arduino）
+
+既存の `quiz_button1.ino` をコピーし、**デバイス名だけ**変えた `.ino` を用意する。
+
+```cpp
+// 例: quiz_button4.ino
+static const char* BLE_DEVICE_NAME = "button4";  // ここだけ変更
+// UUID_SERVICE / UUID_CHAR_NOTIFY はそのまま
+```
+
+その `.ino` を書き込んだ ESP32 を1台用意し、D4–GND にタクトスイッチを接続する。
+
+### 2. BLEManager.swift
+
+`QuizButtonName` に新しい case を追加する。
+
+```swift
+enum QuizButtonName: String, CaseIterable {
+    case button1 = "button1"
+    case button2 = "button2"
+    case button3 = "button3"
+    case button4 = "button4"   // 追加
+}
+```
+
+アプリはこの enum に含まれる名前のペリフェラルだけを接続対象にする。
+
+### 3. QuizViewModel.swift
+
+`displayName(_:)` の switch に、追加したボタンの表示名を追加する。
+
+```swift
+case "button4": return "4番"   // 任意のラベル
+default: return deviceName
+```
+
+### 4. ContentView.swift
+
+- `buttonPanel(deviceName:color:label:isLandscape:)` を呼ぶ行を1つ増やす（例: `button4` 用に色とラベルを指定）。
+- 4台以上にする場合は、レイアウトを `HStack` 1行のままにするか、`VStack` で行を分けて 2 列にするかは好みで調整する。
+
+| ファイル | 変更内容 |
+|----------|----------|
+| 新規 `.ino` | `BLE_DEVICE_NAME` を `"buttonN"` に設定 |
+| `BLEManager.swift` | `QuizButtonName` に `case buttonN = "buttonN"` を追加 |
+| `QuizViewModel.swift` | `displayName` に `"buttonN"` のラベルを追加 |
+| `ContentView.swift` | 対応する `buttonPanel` を1つ追加（色・ラベルを指定） |
+
 ## License
 
 MIT
